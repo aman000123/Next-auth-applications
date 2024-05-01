@@ -1,5 +1,4 @@
 
-
 import Connect from "@/connetc/dbconnetc";
 import UserModel from "@/models/user";
 import bcrypt from 'bcryptjs'
@@ -12,11 +11,12 @@ export async function POST(request) {
     try {
 
         const { username, email, password } = await request.json()
-
         const existingUserVerifiedByUserName = await UserModel.findOne({
             username,
             isVerified: true
         })
+        //In above query, attempting to find a user with the provided username and who is also verified (isVerified: true)
+
         if (existingUserVerifiedByUserName) {
             return Response.json({
                 success: false,
@@ -25,42 +25,35 @@ export async function POST(request) {
                 {
                     status: 400
                 })
-
         }
 
         const existingUserByEmail = await UserModel.findOne({ email })
         let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-        console.log("verify code", verifyCode)
-
 
         //check email exist or not
-
         if (existingUserByEmail) {
-            //if user is  existing then and verified then
+            // Check if user is already verified
             if (existingUserByEmail.isVerified) {
+
                 return Response.json(
                     {
                         success: false,
-                        message: 'User already exists with this email',
+                        message: 'User already exist with this email',
                     },
                     { status: 400 }
                 );
             } else {
-
+                // Update existing user with verification code and expiry
                 const hashedPassword = await bcrypt.hash(password, 10);
                 existingUserByEmail.password = hashedPassword;
                 existingUserByEmail.verifyCode = verifyCode;
-                existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000);   //current time me 1 hour increase
+                existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000); // 1 hour from now
                 //new key se object milta hai
                 //so object refrence store karta hai //date is objects
                 await existingUserByEmail.save();
             }
-
-
         } else {
-
-
-            await existingUserByEmail.save();
+            // Create a new user if no user exists with the provided email
             const hashedPassword = await bcrypt.hash(password, 10);
             const expiryDate = new Date();
             expiryDate.setHours(expiryDate.getHours() + 1);
@@ -75,7 +68,7 @@ export async function POST(request) {
                 isAcceptingMessages: true,
                 messages: [],
             });
-            console.log("new user", newUser)
+
             await newUser.save();
         }
 
@@ -85,6 +78,7 @@ export async function POST(request) {
             username,
             verifyCode
         );
+
         if (!emailResponse.success) {
             return Response.json(
                 {
