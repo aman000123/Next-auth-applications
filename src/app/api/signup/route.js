@@ -1,5 +1,6 @@
 
 import Connect from "@/connetc/dbconnetc";
+
 import UserModel from "@/models/user";
 import bcrypt from 'bcryptjs'
 import { sendVerificationEmail } from "@/helpers/sendVerificationEmail";
@@ -29,6 +30,7 @@ export async function POST(request) {
 
         const existingUserByEmail = await UserModel.findOne({ email })
         let verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+        console.log("verify code", verifyCode)
 
         //check email exist or not
         if (existingUserByEmail) {
@@ -50,6 +52,7 @@ export async function POST(request) {
                 existingUserByEmail.verifyCodeExpiry = new Date(Date.now() + 3600000); // 1 hour from now
                 //new key se object milta hai
                 //so object refrence store karta hai //date is objects
+
                 await existingUserByEmail.save();
             }
         } else {
@@ -78,7 +81,7 @@ export async function POST(request) {
             username,
             verifyCode
         );
-
+        console.log("email response", emailResponse)
         if (!emailResponse.success) {
             return Response.json(
                 {
@@ -92,7 +95,7 @@ export async function POST(request) {
         return Response.json(
             {
                 success: true,
-                message: 'User registered successfully. Please verify your account.',
+                message: 'User registered successfully. Please verify your Email.',
             },
             { status: 201 }
         );

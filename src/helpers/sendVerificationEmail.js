@@ -4,13 +4,17 @@ import VerificationEmail from "../../emailsTemplates/verificationsEmail";
 
 //emails always takes time
 export async function sendVerificationEmail(email, username, verifyCode) {
+    console.log("email", email, username, verifyCode)
     try {
-        await resend.emails.send({
-            from: 'onboarding@resend.dev',
+        console.log("email response")
+        const emailResponse = await resend.emails.send({
+            from: 'aman@123example.com',
             to: email,
-            subject: 'Authentications Message Verification Code',
+            subject: 'Authentication Message Verification Code',
             react: VerificationEmail({ username, otp: verifyCode }),
         });
+
+        console.log("Email sent successfully:", emailResponse);
         return { success: true, message: 'Verification email sent successfully.' };
     } catch (emailError) {
         console.error('Error sending verification email:', emailError);
