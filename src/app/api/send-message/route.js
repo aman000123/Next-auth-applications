@@ -1,6 +1,6 @@
 
 import Connect from '@/connetc/dbconnetc';
-import { UserModel } from '@/models/user'
+import UserModel from '@/models/user'
 
 export async function POST(request) {
     await Connect()
@@ -35,7 +35,7 @@ export async function POST(request) {
         );
 
     } catch (error) {
-        console.error('Error adding message:', error);
+        console.error('Error adding on message:', error);
         return Response.json(
             { message: 'Internal server error', success: false },
             { status: 500 }
