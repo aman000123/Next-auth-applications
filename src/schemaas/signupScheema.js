@@ -2,7 +2,7 @@
 import { z } from 'zod'
 
 //validation
-export const userNameValidation = z.string().min(2, "Username must be atleast 2 cahracters").max(10, "Useranme must be no more than 10 characters").regex(/^[a-zA-Z0-9_]+$/, "Username must not contain special characters");
+export const userNameValidation = z.string().min(2, "Username must be atleast 2 cahracters").max(10, "Useraname must be no more than 10 characters").regex(/^[a-zA-Z0-9_]+$/, "Username must not contain special characters");
 //a-z,A-Z 0-9 _ underscore allow hai
 
 export const SignUpScheema = z.object({
