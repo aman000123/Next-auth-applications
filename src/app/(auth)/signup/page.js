@@ -59,62 +59,69 @@ const Signup = () => {
         checkUniqueUsername();
     }, [debouncedUsername]);
 
-
-    const onSubmit = async (data) => { //data comes from form se hi aata hai
-        console.log("form submit data", data)
-        setIsSubmitting(true)
+    const onSubmit = async (formData) => {
+        setIsSubmitting(true);
         try {
-            // Validate form data against Zod schema
-            const validatedData = SignUpScheema._parse(data);
-            const response = await axios.post('/api/signup', validatedData)
-            console.log("respone in signup", response)
-            toast.success(response?.data?.message)
-            router.push(`/verify/${username}`)
-        }
-        catch (error) {
-            console.log("error in submit form", error)
-            const axiosError = errors
-            //toast.error
-            let errorMsg = axiosError.response?.data.message
+            const validatedData = SignUpScheema.parse(formData);
+            const response = await axios.post('/api/signup', validatedData);
+            console.log("response", response)
+            toast.success(response?.data?.message);
+            console.log("toast", toast)
+            router.push(`/verify/${formData.username}`); // Assuming `username` is part of form data
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            let errorMsg = error.response?.data?.message || "Failed to submit form";
+            toast.error(errorMsg);
+        } finally {
             setIsSubmitting(false);
         }
+    };
 
-    }
+
     return (
         <>
             <div className="container-md">
                 <form className="row g-3" onSubmit={handleSubmit(onSubmit)}>
                     <div className="col-md-7">
-                        <label htmlFor="inputEmail" className="form-label" name="username">UserName</label>
-                        <input type="text" className="form-control" id="inputEmail"
-                            {...register("username", { required: true, maxLength: 10, minLength: 2 })}
+                        <label htmlFor="inputEmail" className="form-label">Username</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="inputEmail"
+                            {...register("username", {
+                                required: true,
+                                minLength: 2,
+                                maxLength: 10,
+                                pattern: /^[a-zA-Z0-9_]+$/,
+                            })}
                             onChange={(e) => handleDebouncedUsername(e.target.value)}
                         />
                         {isCheckingUsername && <p>Checking username...</p>}
-                        <p className="text-sm"
-                            style={{
-                                color: usernameMessage !== 'Username is unique' ? 'red' : 'green',
-                            }}
-                        >
+                        <p className="text-sm" style={{ color: usernameMessage !== 'Username is unique' ? 'red' : 'green' }}>
                             {usernameMessage}
                         </p>
                     </div>
                     <div className="col-md-7">
-                        <label htmlFor="inputEmail4" className="form-label" name="email">Email</label>
-                        <input type="email" className="form-control" id="inputEmail4"
+                        <label htmlFor="inputEmail4" className="form-label">Email</label>
+                        <input
+                            type="email"
+                            className="form-control"
+                            id="inputEmail4"
                             {...register("email", { required: true, pattern: /^\S+@\S+$/i })}
                         />
                     </div>
                     <div className="col-md-7">
-                        <label htmlFor="inputPassword4" className="form-label" name="password"
+                        <label htmlFor="inputPassword4" className="form-label">Password</label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            id="inputPassword4"
                             {...register("password", { required: true })}
-                        >Password</label>
-                        <input type="password" className="form-control" id="inputPassword4" />
+                        />
                     </div>
                     <div className="col-12">
                         <button type="submit" className="btn btn-primary">
-
-                            {isSubmitting ? 'Loading' : 'Sign up'}
+                            {isSubmitting ? 'Loading...' : 'Sign up'}
                         </button>
                     </div>
                 </form>
