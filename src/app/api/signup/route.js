@@ -17,7 +17,6 @@ export async function POST(request) {
             isVerified: true
         })
         //In above query, attempting to find a user with the provided username and who is also verified (isVerified: true)
-
         if (existingUserVerifiedByUserName) {
             return Response.json({
                 success: false,

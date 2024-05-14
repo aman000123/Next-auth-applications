@@ -4,8 +4,6 @@ import { useSession, signIn, signOut } from "next-auth/react"
 //folder name  ==(auth)  grouping karte hain collection==>routes me kam nhi karta hai
 //() parenthisis lagene se wo route me count nhi grouping me use 
 
-
-
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form"
 import Link from 'next/link';
@@ -13,54 +11,58 @@ import axios from "axios";
 import { useDebouncedCallback } from 'use-debounce';
 import { useRouter } from "next/navigation";
 import { SignUpScheema } from "@/schemaas/signupScheema";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { SignInScheema } from "@/schemaas/signinScheema";
 
 const SignIn = () => {
-    const { register, handleSubmit, watch, formState: { errors }, } = useForm()
+    const { register, handleSubmit } = useForm()
 
-    const [isCheckingUsername, setIsCheckingUsername] = useState(false);
     //loader implement for check username is unique or not
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-
-
     const router = useRouter()
 
-
-
     const onSubmit = async (formData) => {
-        //use next auth in signun
+        setIsSubmitting(true);
 
-        const result = await signIn('credentials', {
-            redirect: false,//redirect automatic nhi
-            identifier: formData.identifier,//identifier should email
-            password: formData.password,
-        })
+        try {
+            // Validate form data using a schema (you can define your own validation schema)
+            const validatedData = SignInScheema.parse(formData);
 
-        if (result?.error) {
-            if (result.error === 'CredentialsSignin') {
-                toast.error('Incorrect username or password')
+            // Sign in with credentials provider (NextAuth)
+            const result = await signIn('credentials', {
+                redirect: false,
+                identifier: validatedData.identifier,
+                password: validatedData.password,
+            });
 
-            } else {
-                toast.error()
-                console.log("error in")
+            // Check the result from the signIn method
+            console.log("result", result)
+            if (result?.error) {
+                // Handle specific authentication errors
+                if (result.error === 'No user found with this email') {
+                    toast.error('User not found. Please check your email/username and try again.');
+                } else if (result.error === 'Incorrect password') {
+                    toast.error('Wrong password');
+                } else {
+                    toast.error('Error signing in. Please try again.');
+                }
+            } else if (result?.url) {
+                console.log('Successful sign-in');
+                router.push('/dashboard')
             }
-        }
-
-        if (result?.url) {
-            console.log("success")
-            // router.replace('/dashboard');
+        } catch (error) {
+            console.error('Error signing in:', error);
+            toast.error('Error signing in. Please try again.');
+        } finally {
+            setIsSubmitting(false); // Reset submitting state
         }
     };
-
 
     return (
         <>
             <div className="container-md">
-                <form className="row g-3" onSubmit={handleSubmit(onSubmit)}>
-
-                    <div className="col-md-7">
+                <form className="row g-3 mt-4" style={{ width: "30rem", margin: "auto" }} onSubmit={handleSubmit(onSubmit)} >
+                    <div className="col-md-12">
                         <label htmlFor="inputEmail4" className="form-label">Email/Username</label>
                         <input
                             type="email"
@@ -68,10 +70,10 @@ const SignIn = () => {
                             placeholder="Email/Username"
                             id="inputEmail4"
                             name="identifier"
-                            {...register("email", { required: true, pattern: /^\S+@\S+$/i })}
+                            {...register("identifier", { required: true, pattern: /^\S+@\S+$/i })}
                         />
                     </div>
-                    <div className="col-md-7">
+                    <div className="col-md-12">
                         <label htmlFor="inputPassword4" className="form-label">Password</label>
                         <input
                             type="password"
@@ -82,7 +84,7 @@ const SignIn = () => {
                     </div>
                     <div className="col-12">
                         <button type="submit" className="btn btn-primary">
-                            {isSubmitting ? 'Loading...' : 'Sign up'}
+                            {isSubmitting ? 'Signing In...' : 'Sign In'}
                         </button>
                     </div>
                 </form>

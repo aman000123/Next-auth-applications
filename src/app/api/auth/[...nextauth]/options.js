@@ -27,6 +27,7 @@ export const authOptions = {
 
             //authorize ke liye custom methods
             async authorize(credentials) {
+
                 //credential accespt in parameter
                 //return promise karta hai
                 await Connect()
@@ -42,7 +43,7 @@ export const authOptions = {
                         ]
                     })
                     if (!user) {
-                        throw new Error('No user found with this email');
+                        throw new Error('No user found with this email or username');
                     }
                     if (!user.isVerified) {
                         throw new Error('Please verify your account before logging in');
@@ -52,15 +53,22 @@ export const authOptions = {
                         credentials.password,
                         user.password
                     );
-                    //compare the password
-                    if (isPasswordCorrect) {
-                        return user;
-                    } else {
+                    if (!isPasswordCorrect) {
                         throw new Error('Incorrect password');
                     }
+
+                    return user;
+
                 } catch (error) {
                     console.log("errro in next auth options", error)
-                    throw new Error(err);
+
+                    if (error.message === 'No user found with this email or username') {
+                        throw new Error('No user found with this email'); // Specific message for email
+                    } else if (error.message === 'Incorrect password') {
+                        throw new Error('Incorrect password'); // Specific message for password
+                    } else {
+                        throw new Error('Authentication failed');
+                    }
 
                 }
             }
@@ -97,7 +105,7 @@ export const authOptions = {
 
     },
     pages: {
-        signIn: '/signin'///page rautes to handel next auth using
+        signIn: '/signin'///page routes to handel next auth using
     },
     session: {
         strategy: 'jwt'//which have token that user only login

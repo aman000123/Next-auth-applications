@@ -11,7 +11,7 @@ import {
 } from '@react-email/components';
 
 export default function VerificationEmail({ username, otp }) {
-    console.log()
+
     return (
         <Html lang="en" dir="ltr">
             <Head>

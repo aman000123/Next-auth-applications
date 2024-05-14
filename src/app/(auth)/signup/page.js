@@ -7,7 +7,7 @@ import axios from "axios";
 import { useDebouncedCallback } from 'use-debounce';
 import { useRouter } from "next/navigation";
 import { SignUpScheema } from "@/schemaas/signupScheema";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 const Signup = () => {
     const { register, handleSubmit, watch, formState: { errors }, } = useForm()
@@ -70,8 +70,16 @@ const Signup = () => {
             router.push(`/verify/${formData.username}`); // Assuming `username` is part of form data
         } catch (error) {
             console.error("Error submitting form:", error);
+            if (error.name === 'ZodError') {
+                const passwordError = error.errors.find(err => err.path[0] === 'password');
+                if (passwordError) {
+                    toast.error(passwordError.message);
+                    return;
+                }
+            }
             let errorMsg = error.response?.data?.message || "Failed to submit form";
             toast.error(errorMsg);
+
         } finally {
             setIsSubmitting(false);
         }
@@ -81,8 +89,8 @@ const Signup = () => {
     return (
         <>
             <div className="container-md">
-                <form className="row g-3" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="col-md-7">
+                <form className="row g-3 mt-5" style={{ width: "25rem", margin: "auto", border: "2px solid " }} onSubmit={handleSubmit(onSubmit)}>
+                    <div className="col-12">
                         <label htmlFor="inputEmail" className="form-label">Username</label>
                         <input
                             type="text"
@@ -101,7 +109,7 @@ const Signup = () => {
                             {usernameMessage}
                         </p>
                     </div>
-                    <div className="col-md-7">
+                    <div className="col-12">
                         <label htmlFor="inputEmail4" className="form-label">Email</label>
                         <input
                             type="email"
@@ -110,7 +118,7 @@ const Signup = () => {
                             {...register("email", { required: true, pattern: /^\S+@\S+$/i })}
                         />
                     </div>
-                    <div className="col-md-7">
+                    <div className="col-12">
                         <label htmlFor="inputPassword4" className="form-label">Password</label>
                         <input
                             type="password"
@@ -119,7 +127,7 @@ const Signup = () => {
                             {...register("password", { required: true })}
                         />
                     </div>
-                    <div className="col-12">
+                    <div className="">
                         <button type="submit" className="btn btn-primary">
                             {isSubmitting ? 'Loading...' : 'Sign up'}
                         </button>

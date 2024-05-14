@@ -5,7 +5,7 @@ import { SignInScheema } from "@/schemaas/signinScheema";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 
 
@@ -32,7 +32,7 @@ const VerifyAccount = ({ }) => {
         } catch (error) {
             console.error("Error submitting form verify:", error);
             let errorMsg = error.response?.data?.message || "Failed to submit form";
-            toast.error(errorMsg);
+            toast.error(error?.response?.data?.message);
         }
     };
 
@@ -40,9 +40,9 @@ const VerifyAccount = ({ }) => {
     return (
         <>
             <div className="container-md">
-                <form className="row g-3" onSubmit={handleSubmit(onSubmit)}>
+                <form className="row g-3 mt-5" onSubmit={handleSubmit(onSubmit)} style={{ width: "25rem", margin: "auto", border: "2px solid " }}>
                     <h3>Verify your account</h3>
-                    <div className="col-md-7">
+                    <div className="">
                         <label htmlFor="inputEmail4" className="form-label">Verification Code</label>
                         <input
                             type="number"

@@ -24,11 +24,11 @@ export async function middleware(NextRequest) {
             url.pathname.startsWith('/verify') ||
             url.pathname === '/')
     ) {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+        return NextResponse.redirect(new URL('/dashboard', NextRequest.url));
     }
 
     if (!token && url.pathname.startsWith('/dashboard')) {
-        return NextResponse.redirect(new URL('/signin', request.url));
+        return NextResponse.redirect(new URL('/signin', NextRequest.url));
     }
 
     return NextResponse.next();
