@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Toaster } from "react-hot-toast";
 import AuthProvider from "@/context/authProvider";
+import Navbar from "@/component/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
 
       <body className={inter.className}>
+
         <AuthProvider>
+          <Navbar />
           {children}
           <Toaster />
         </AuthProvider>

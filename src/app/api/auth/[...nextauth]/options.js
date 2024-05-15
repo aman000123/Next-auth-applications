@@ -81,6 +81,7 @@ export const authOptions = {
 
             //inside token we want maximum data so i can find values from there when need
 
+            console.log("token is", token)
             if (user) {
                 token._id = user._id?.toString(); // Convert ObjectId to string
                 token.isVerified = user.isVerified;

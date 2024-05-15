@@ -3,38 +3,30 @@ import { useSession, signIn, signOut } from "next-auth/react"
 
 //folder name  ==(auth)  grouping karte hain collection==>routes me kam nhi karta hai
 //() parenthisis lagene se wo route me count nhi grouping me use 
-
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form"
 import Link from 'next/link';
-import axios from "axios";
-import { useDebouncedCallback } from 'use-debounce';
 import { useRouter } from "next/navigation";
-import { SignUpScheema } from "@/schemaas/signupScheema";
 import { toast } from "react-hot-toast";
 import { SignInScheema } from "@/schemaas/signinScheema";
 
 const SignIn = () => {
     const { register, handleSubmit } = useForm()
-
     //loader implement for check username is unique or not
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter()
 
     const onSubmit = async (formData) => {
         setIsSubmitting(true);
-
         try {
             // Validate form data using a schema (you can define your own validation schema)
             const validatedData = SignInScheema.parse(formData);
-
             // Sign in with credentials provider (NextAuth)
             const result = await signIn('credentials', {
                 redirect: false,
                 identifier: validatedData.identifier,
                 password: validatedData.password,
             });
-
             // Check the result from the signIn method
             console.log("result", result)
             if (result?.error) {
@@ -42,13 +34,14 @@ const SignIn = () => {
                 if (result.error === 'No user found with this email') {
                     toast.error('User not found. Please check your email/username and try again.');
                 } else if (result.error === 'Incorrect password') {
-                    toast.error('Wrong password');
+                    toast.error('Incorrect password');
                 } else {
                     toast.error('Error signing in. Please try again.');
                 }
             } else if (result?.url) {
                 console.log('Successful sign-in');
-                router.push('/dashboard')
+                toast.success("Login Sucessfully done")
+                router.push('/')
             }
         } catch (error) {
             console.error('Error signing in:', error);
@@ -93,7 +86,5 @@ const SignIn = () => {
         </>
     )
 }
-
-
 export default SignIn
 
