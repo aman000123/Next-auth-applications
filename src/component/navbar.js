@@ -1,64 +1,88 @@
+"use client";
 
-"use client"
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import React from "react";
+import Logo from '../assets/OIP (14).svg'
+import Image from "next/image";
 
-import { useSession, signOut } from "next-auth/react"
-import { User } from 'next-auth'
-import { useRouter } from "next/navigation"
-import Link from "next/link"
 const Navbar = () => {
+    const { data } = useSession(); // useSession() returns an object containing two values: data and status
+    const router = useRouter();
 
-    const { data } = useSession()//useSession() returns an object containing two values: data and status:
-    console.log("data", data)
-    console.log("user related", data?.user)
-
-    const router = useRouter()
-
-
-    const handleLogOut = (e) => {
-        e.preventDefault()
-        signOut()
-        router.push('/signin')
-    }
-
+    const handleLogOut = async (e) => {
+        e.preventDefault();
+        await signOut({ redirect: false });
+        router.push("/signin");
+    };
     return (
-        <>
-            <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <div className="container-fluid">
-                    <a className="navbar-brand" href="#">Navbar</a>
-                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon" />
-                    </button>
-                    <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
+            <div className="container-fluid">
+                <button
+                    className="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarTogglerDemo03"
+                    aria-controls="navbarTogglerDemo03"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <span className="navbar-toggler-icon" />
+                </button>
+                <Link href="/" className="navbar-brand">
+                    <Image
+                        src={Logo}
+                        alt="Logo"
+                        width={50}
+                        height={50}
+                    />
+                </Link>
+                <div className="collapse navbar-collapse" id="navbarTogglerDemo03">
+                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li className="nav-item">
+                            <Link className="nav-link" href="#">
+                                Dashboard
+                            </Link>
+                        </li>
+                        {data ? (
+                            <>
+                                <li className="nav-item">
+                                    <span className="nav-link">{data.user.username}</span>
+                                </li>
+                                <li className="nav-item">
+                                    <button
+                                        className="nav-link btn"
+                                        type="button"
+                                        onClick={handleLogOut}
+                                    >
+                                        Logout
+                                    </button>
+                                </li>
+                            </>
+                        ) : (
                             <li className="nav-item">
-                                <a className="nav-link active" aria-current="page" href="#">Home</a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" href="#">Link</a>
-                            </li>
-
-
-                            {data ? (
-                                <>
-                                    <li className="nav-item">
-                                        {data?.user?.username}
-
-                                    </li>
-                                    <button className="nav-link" onClick={handleLogOut}>Logout</button>
-                                </>
-                            ) :
-                                <Link className="nav-item" href="/signin">
-                                    <button>Signin</button>
+                                <Link className="nav-link" href="/signin">
+                                    Signin
                                 </Link>
-                            }
-                        </ul>
-
-                    </div>
+                            </li>
+                        )}
+                    </ul>
+                    <form className="d-flex">
+                        <input
+                            className="form-control me-2"
+                            type="search"
+                            placeholder="Search"
+                            aria-label="Search"
+                        />
+                        <button className="btn btn-outline-success" type="submit">
+                            Search
+                        </button>
+                    </form>
                 </div>
-            </nav>
+            </div>
+        </nav>
+    );
+};
 
-        </>
-    )
-}
-
-export default Navbar
+export default Navbar;
